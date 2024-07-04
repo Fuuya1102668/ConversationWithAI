@@ -16,7 +16,7 @@ quantization_config = BitsAndBytesConfig(
         bnb_4bit_compute_btype=torch.bfloat16
         )
 
-model_path = "../models/marged_model/"
+model_path = "./models/marged_model/"
 tokenizer = AutoTokenizer.from_pretrained(
         pretrained_model_name_or_path=model_path,
         )
