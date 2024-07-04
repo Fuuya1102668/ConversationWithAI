@@ -1,4 +1,4 @@
-FROM llama3 
+FROM Fugaku-LLM-13B-instruct-0325b-q5_k_m.gguf
 
 # set the temperature to 1 [higher is more creative, lower is more coherent]
 PARAMETER temperature 1
