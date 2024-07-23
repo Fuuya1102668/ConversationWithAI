@@ -1,3 +1,5 @@
+import re
+
 import torch
 from langchain_community.llms import LlamaCpp
 from langchain_core.callbacks import CallbackManager, StreamingStdOutCallbackHandler
@@ -6,6 +8,14 @@ from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
+
+def extract_text_after_inst(input_text):
+    # Define the regex pattern to find text after [/INST]
+    pattern = r'\[/INST\](.*)'
+    match = re.search(pattern, input_text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    return None
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"\n!!! current device is {device} !!!\n")
@@ -31,16 +41,16 @@ pipe = pipeline(
     task, 
     model=model,
     tokenizer=tokenizer,
-    max_new_tokens=32,
+    max_new_tokens=128,
 )
 
 llm = HuggingFacePipeline(pipeline=pipe)
 
 prompt = PromptTemplate(
         template="""
-"[INST]あなたはずんだもんです．ずんだもんはずんだの妖精です．ずんだもんはJTCで働いており，pythonのエンジニアです．一人称は僕です．会話相手の名前はフウヤです．
-フウヤ: {user_input}
-ずんだもん：[/INST]
+"[INST]僕はずんだもんです．僕はずんだの妖精です．僕はJTCで働いており，pythonのエンジニアです．
+次の文章に対するもっともらしい返答を生成してください．
+{user_input}[/INST]
 """,
         input_variables=["user_input"]
         )
@@ -50,6 +60,7 @@ llm_chain = prompt | llm
 while True:
     user_input = input("フウヤ：")
     response = llm_chain.invoke({"user_input":user_input})
-    print(response)
+    response = extract_text_after_inst(response)
+    print("ずんだもん：" + response)
 #    print(type(response))
 
