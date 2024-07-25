@@ -10,23 +10,25 @@ from langchain_core.messages import HumanMessage, AIMessage
 from langchain_openai import ChatOpenAI
 
 import getapi, os
-from style_bert_vits2.nlp import bert_models
-from style_bert_vits2.constants import Languages
-from pathlib import Path
-from style_bert_vits2.tts_model import TTSModel
 import sounddevice as sd
-import voice
+import bs4
+import requests
+from pydub import AudioSegment
+from pydub.playback import play
+import io
 
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in store:
         store[session_id] = InMemoryChatMessageHistory()
     return store[session_id]
 
-assets_root = Path("../Style-Bert-VITS2/model_assets/zundamon/")
-model_file = assets_root / "zundamon_e100_s16200.safetensors"
-config_file = assets_root / "config.json"
-style_file = assets_root / "style_vectors.npy"
-voice_model = voice.load_model(model_file=model_file, config_file=config_file, style_file=style_file)
+url = "http://127.0.0.1:5000/voice"
+headers = {"accept": "audio/wav"}
+params = {
+    "text":"",
+    "encodeng":"utf-8",
+    "model_name":"zundamon",
+}
 
 os.environ["OPENAI_API_KEY"] = getapi.get_api()
 
@@ -34,7 +36,7 @@ store = {}
 
 config = {"configurable": {"session_id": "zunda"}}
 
-text_model = ChatOpenAI(model="gpt-3.5-turbo")
+text_model = ChatOpenAI(model="ft:gpt-3.5-turbo-0125:personal::9ol99gYa")
 
 prompt = ChatPromptTemplate.from_messages(
     [
@@ -55,13 +57,15 @@ with_message_history = RunnableWithMessageHistory(
 
 while True:
     inputs = input("  あなた  ：")
-    response = with_message_history.invoke(
+    outputs = with_message_history.invoke(
         [HumanMessage(content=inputs)],
         config=config,
     )
-
-    sr, audio = voice_model.infer(text=response.content)
-    print("ずんだもん：" + response.content)
-    sd.play(audio, sr)
-    sd.wait()
+    params["text"] = outputs.content
+    response = requests.post(url, headers=headers, params=params)
+    with open('output.wav', 'wb') as f:
+        f.write(response.content)
+    print("ずんだもん：" + outputs.content)
+    audio_segment = AudioSegment.from_file(io.BytesIO(response.content), format="wav")
+    play(audio_segment)
 
