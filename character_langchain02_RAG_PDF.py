@@ -11,6 +11,7 @@ from langchain_openai import ChatOpenAI
 from langchain.chains import create_retrieval_chain, create_history_aware_retriever
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_chroma import Chroma
+from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.document_loaders import PDFMinerLoader
 from langchain_core.prompts import ChatPromptTemplate
@@ -47,7 +48,7 @@ config = {"configurable": {"session_id": "zunda"}}
 #text_model = ChatOpenAI(model="gpt-3.5-turbo")
 text_model = ChatOpenAI(model="ft:gpt-3.5-turbo-0125:personal::9ol99gYa")
 
-loader = PDFMinerLoader("stu.pdf")
+loader = DirectoryLoader("./rag_source", glob="*.pdf")
 docs = loader.load()
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 splits = text_splitter.split_documents(docs)
