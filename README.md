@@ -21,12 +21,19 @@ voicevoxの話者はずんだもんで設定している．
 ## 構築手順
 - git clone 
 
-`git clone git@github.com:Fuuya1102668/ConversationWithAI.git`
+```
+git clone git@github.com:Fuuya1102668/ConversationWithAI.git`
+```
 
 - モデルの調教
 
-`ollama create znd -f Modelfile`
+```
+ollama create znd -f Modelfile
+```
 
 - 実行
 
-`python3 main.py`
+```
+python3 main.py
+```
+
