@@ -11,13 +11,6 @@ voicevoxの話者はずんだもんで設定している．
 
 # 環境の構築
 
-## 必要なパッケージ
-- 
-
-- 
-
-- 
-
 ## 構築手順
 - git clone 
 
@@ -25,15 +18,27 @@ voicevoxの話者はずんだもんで設定している．
 git clone git@github.com:Fuuya1102668/ConversationWithAI.git`
 ```
 
-- モデルの調教
+- 仮想環境を作る
 
 ```
-ollama create znd -f Modelfile
+python3 venv vnev
+source venv/bin/activate
+``` 
+
+- モジュールのインストール
+```
+pip install -r requirements.txt
+```
+
+- サーバの起動
+
+```
+o;asnboan:
 ```
 
 - 実行
 
 ```
-python3 main.py
+python3 character_langchain_RAG_PDF.py
 ```
 
