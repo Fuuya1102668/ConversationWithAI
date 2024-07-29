@@ -1,6 +1,10 @@
 import socket
 
-master_ip = "202.13.169.179"
+#########
+# SLAVE #
+#########
+
+master_ip = "192.168.11.48"
 master_port = 12345
 
 slave_port = 12346

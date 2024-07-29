@@ -31,7 +31,7 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
         store[session_id] = InMemoryChatMessageHistory()
     return store[session_id]
 
-url = "http://127.0.0.1:5000/voice"
+url = "http://202.13.169.179:5000/voice"
 headers = {"accept": "audio/wav"}
 params = {
     "text":"",
