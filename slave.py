@@ -14,7 +14,7 @@ while True:
     inputs = input("  あなた  ：")
     if inputs.lower() == "exit":
         break
-    s.sendto(inputs.encode(), (master_ip, port))
+    s.sendto(inputs.encode(), (master_ip, master_port))
 
     data, addr = s.recvfrom(1024)
     print(date.decode())
