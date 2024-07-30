@@ -12,7 +12,7 @@ master_port = 12345
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind(("", master_port))
 
-print("conectino")
+print("Conectino")
 
 while True:
     data, addr = s.recvfrom(65535)

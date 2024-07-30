@@ -4,7 +4,7 @@ import socket
 # SLAVE #
 #########
 
-master_ip = "192.168.11.48"
+master_ip = "192.168.11.50"
 master_port = 12345
 
 slave_port = 12346
