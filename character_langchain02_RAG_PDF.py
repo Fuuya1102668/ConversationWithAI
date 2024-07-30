@@ -19,25 +19,11 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 import getapi, os
-import sounddevice as sd
-import bs4
-import requests
-from pydub import AudioSegment
-from pydub.playback import play
-import io
 
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in store:
         store[session_id] = InMemoryChatMessageHistory()
     return store[session_id]
-
-url = "http://202.13.169.179:5000/voice"
-headers = {"accept": "audio/wav"}
-params = {
-    "text":"",
-    "encodeng":"utf-8",
-    "model_name":"zundamon",
-}
 
 os.environ["OPENAI_API_KEY"] = getapi.get_api()
 
@@ -45,7 +31,6 @@ store = {}
 
 config = {"configurable": {"session_id": "zunda"}}
 
-#text_model = ChatOpenAI(model="gpt-3.5-turbo")
 text_model = ChatOpenAI(model="ft:gpt-3.5-turbo-0125:personal::9ol99gYa")
 
 loader = DirectoryLoader("./rag_source", glob="*.pdf")
@@ -81,28 +66,30 @@ qa_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-#question_answer_chain = create_stuff_documents_chain(text_model, prompt)
-#rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 question_answer_chain = create_stuff_documents_chain(text_model, qa_prompt)
 rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
-#chain = rag_chain.pick("answer")
+conversational_rag_chain = RunnableWithMessageHistory(
+    rag_chain,
+    get_session_history,
+    input_messages_key="input",
+    history_messages_key="chat_history",
+    output_messages_key="answer",
+    )
 
 chat_history = []
 while True:
     outputs = ""
     inputs = input("  あなた  ：")
-    outputs = rag_chain.invoke({"input":inputs, "chat_history": chat_history})
+    outputs = conversational_rag_chain.invoke(
+        {"input":inputs},
+        #{"chat_history":chat_history},
+        config=config,
+        )
     chat_history.extend(
         [
             HumanMessage(content=inputs),
             AIMessage(content=outputs["answer"]),
         ]
     )
-    params["text"] = outputs["answer"]
-    response = requests.post(url, headers=headers, params=params)
-    with open('output.wav', 'wb') as f:
-        f.write(response.content)
     print("ずんだもん：", outputs["answer"])
-    audio_segment = AudioSegment.from_file(io.BytesIO(response.content), format="wav")
-    play(audio_segment)
 

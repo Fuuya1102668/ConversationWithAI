@@ -61,11 +61,5 @@ while True:
         [HumanMessage(content=inputs)],
         config=config,
     )
-    params["text"] = outputs.content
-    response = requests.post(url, headers=headers, params=params)
-    with open('output.wav', 'wb') as f:
-        f.write(response.content)
     print("ずんだもん：" + outputs.content)
-    audio_segment = AudioSegment.from_file(io.BytesIO(response.content), format="wav")
-    play(audio_segment)
 
