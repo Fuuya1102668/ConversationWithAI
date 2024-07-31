@@ -19,25 +19,11 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 import getapi, os
-import sounddevice as sd
-import bs4
-import requests
-from pydub import AudioSegment
-from pydub.playback import play
-import io
 
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in store:
         store[session_id] = InMemoryChatMessageHistory()
     return store[session_id]
-
-url = "http://202.13.169.179:5000/voice"
-headers = {"accept": "audio/wav"}
-params = {
-    "text":"",
-    "encodeng":"utf-8",
-    "model_name":"zundamon",
-}
 
 os.environ["OPENAI_API_KEY"] = getapi.get_api()
 
@@ -45,7 +31,6 @@ store = {}
 
 config = {"configurable": {"session_id": "zunda"}}
 
-#text_model = ChatOpenAI(model="gpt-3.5-turbo")
 text_model = ChatOpenAI(model="ft:gpt-3.5-turbo-0125:personal::9ol99gYa")
 
 loader = DirectoryLoader("./rag_source", glob="*.pdf")
@@ -91,6 +76,8 @@ conversational_rag_chain = RunnableWithMessageHistory(
     output_messages_key="answer",
     )
 
+with open("history_" + config + ".plk", 
+
 chat_history = []
 while True:
     outputs = ""
@@ -105,11 +92,6 @@ while True:
             AIMessage(content=outputs["answer"]),
         ]
     )
-    params["text"] = outputs["answer"]
-    response = requests.post(url, headers=headers, params=params)
-    with open('output.wav', 'wb') as f:
-        f.write(response.content)
     print("ずんだもん：", outputs["answer"])
-    audio_segment = AudioSegment.from_file(io.BytesIO(response.content), format="wav")
-    play(audio_segment)
+    print(chat_history)
 
