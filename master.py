@@ -10,12 +10,17 @@ import simpleaudio as sa
 import socket
 
 os.environ["OPENAI_API_KEY"] = get.get_api()
-master_ip = get.get_maste_ip()
 slave_ip = get.get_slave_ip()
-slave_port = get.get_slave_port()
+slave_port = int(get.get_slave_port())
+master_port = int(get.get_master_port())
 
-s = socket.socket(socket.AF.INET, socket.SOCK_DGRAM)
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(("", master_port))
+s.listen(1)
+conn, addr = s.accept()
+####################################
+# ここから下はUDP仕様になっている．#
+####################################
 
 config = {"configurable": {"session_id": "zunda"}}
 model_name = "ft:gpt-3.5-turbo-0125:personal::9ol99gYa"
@@ -40,10 +45,12 @@ try:
         chat_history = pickle.load(f)
 except FileNotFoundError:
     chat_history = []
+print("System startup is complete.")
 
 while True:
     outputs = ""
     inputs, addr = s.recvfrom(65535)
+    inputs = inputs.decode()
     if inputs.lower() == "exit":
         break
     outputs = conversational_rag_chain.invoke(
@@ -51,8 +58,15 @@ while True:
         config=config,
         )
     chat_history = rag.add_history(chat_history, inputs, outputs)
-    response = t2s.generate_speech(outputs["answer"]
-    s.sendto(picle.dumps(response), (slave_ip, slave_port))
+    response = t2s.generate_speech(outputs["answer"])
+    response = pickle.dumps(response.content)
+    print(len(response))
+    for i in range(0, len(response), 4096):
+        chunk = response[i:i+4096]
+        print(i)
+        s.sendto(chunk, (slave_ip, slave_port))
+    s.sendto(b"__end__", (slave_ip, slave_port))
+    print("done")
     #print("ずんだもん：", outputs["answer"])
     #sa.WaveObject.from_wave_file(io.BytesIO(response.content)).play()
     #audio_segment = AudioSegment.from_file(io.BytesIO(response.content),foemat="wav")
