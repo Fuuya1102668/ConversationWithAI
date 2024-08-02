@@ -20,7 +20,7 @@ print("Conection server")
 
 while True:
     inputs = input("  あなた  ：")
-    s.sendall(inputs.encode(), (master_ip, int(master_port)))
+    s.sendall(inputs.encode())
     if inputs.lower() == "exit":
         break
     response = s.recv(1000000)
