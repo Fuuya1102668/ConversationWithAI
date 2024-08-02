@@ -14,7 +14,7 @@ master_port = get.get_master_port()
 slave_port = get.get_slave_port()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((master_ip, master_port))
+s.connect((master_ip, int(master_port)))
 
 print("Conection server")
 
