@@ -11,7 +11,7 @@ import simpleaudio as sa
 
 master_ip = get.get_master_ip()
 master_port = get.get_master_port()
-slave_port = get.get_slava_port()
+slave_port = get.get_slave_port()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((master_ip, master_port))
