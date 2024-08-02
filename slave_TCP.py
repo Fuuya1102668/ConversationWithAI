@@ -1,5 +1,6 @@
 import getapi as get
 import socket
+import pickle
 
 import io
 import simpleaudio as sa
