@@ -23,3 +23,6 @@ torch
 torchaudio
 transformers
 umap-learn
+dotenv
+load_dotenv
+simpleaudio
