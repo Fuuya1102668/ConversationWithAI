@@ -23,12 +23,8 @@ while True:
     s.sendall(inputs.encode())
     if inputs.lower() == "exit":
         break
-    while True:
-        chunk = s.recv(4096)
-        print("receve data : ",len(chunk))
-        if not chunk:
-            break
-        response += chunk
+    response = s.recv(1000000)
+    print("data receved")
     print("Total : " + str(len(response)))
     response = pickle.loads(response)
     sa.WaveObject.from_wave_file(io.BytesIO(response.content)).play()
