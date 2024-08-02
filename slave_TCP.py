@@ -34,7 +34,7 @@ try:
                 print("Total : ", len(response))
                 break
             response += part
-            print("data received :", len(response))
+            print("response :", len(response))
 
         
         response_content = pickle.loads(response)
