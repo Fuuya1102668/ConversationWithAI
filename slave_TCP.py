@@ -27,7 +27,7 @@ try:
             break
         
         response = b''
-        response = s.recv(4096)
+        response = s.recv(1000000)
         print("Data received")
         print("Total : " + str(len(response)))
         
