@@ -15,9 +15,12 @@ slave_port = int(get.get_slave_port())
 master_port = int(get.get_master_port())
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind(("", master_port))
 s.listen(1)
+print("Server is listening on port", master_port)
 conn, addr = s.accept()
+print("Connection from", addr)
 
 config = {"configurable": {"session_id": "zunda"}}
 model_name = "ft:gpt-3.5-turbo-0125:personal::9ol99gYa"
@@ -46,7 +49,12 @@ print("System startup is complete.")
 
 while True:
     outputs = ""
-    inputs = s.recv(1000000)
+    inputs = b""
+    while True:
+        chunk = conn.recv(4096)
+        if not chunk:
+            break
+        inputs += chunk
     inputs = inputs.decode()
     print("inputs : " + str(inputs))
     if inputs.lower() == "exit":
