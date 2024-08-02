@@ -32,7 +32,7 @@ try:
             if b'__end__' in part:
                 print("Data received")
                 print("Total : ", len(response))
-                response += part.response(b'__end__', b'')
+                response += part.replace(b'__end__', b'')
                 break
             response += part
             print("response :", len(response))
