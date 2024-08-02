@@ -31,6 +31,7 @@ try:
             part = s.recv(4096)
             if not part:
                 break
+			print("data received")
             response += part
 
         print("Data received")
