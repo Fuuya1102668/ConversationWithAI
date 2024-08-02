@@ -27,9 +27,14 @@ try:
             break
         
         response = b''
-        response = s.recv(1000000)
+        while True:
+            part = s.recv(4096)
+            if not part:
+                break
+            response += part
+
         print("Data received")
-        print("Total : " + str(len(response)))
+        print("Total : ", len(response))
         
         response_content = pickle.loads(response)
         sa.WaveObject.from_wave_file(io.BytesIO(response_content)).play()
