@@ -24,7 +24,8 @@ while True:
     if inputs.lower() == "exit":
         break
     while True:
-        response = s.recv(4096)
+        chunk = s.recv(4096)
+        print("receve data : ",len(chunk))
         if not chunk:
             break
         response += chunk
