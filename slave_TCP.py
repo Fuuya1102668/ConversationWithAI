@@ -29,7 +29,7 @@ try:
         response = b''
         while True:
             part = s.recv(4096)
-            if not part:
+            if part == b'__end__':
                 print("Data received")
                 print("Total : ", len(response))
                 break
