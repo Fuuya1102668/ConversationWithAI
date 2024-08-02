@@ -69,6 +69,7 @@ def handle_client_connection(conn):
             response = pickle.dumps(response.content)
             print("response size : ", len(response))
             conn.sendall(response)
+            conn.sendall(b'__end__')
             print("done")
         except (BrokenPipeError, ConnectionResetError, socket.timeout) as e:
             print(f"Error: {e}, connection lost")
