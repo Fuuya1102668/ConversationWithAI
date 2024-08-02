@@ -14,30 +14,28 @@ slave_ip = get.get_slave_ip()
 slave_port = int(get.get_slave_port())
 master_port = int(get.get_master_port())
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind(("", master_port))
-s.listen(1)
-print("Server is listening on port", master_port)
-conn, addr = s.accept()
-print("Connection from", addr)
+# ソケットの設定と接続の待機
+def setup_server_socket(port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind(("", port))
+    s.listen(1)
+    print("Server is listening on port", port)
+    return s
+
+s = setup_server_socket(master_port)
 
 config = {"configurable": {"session_id": "zunda"}}
 model_name = "ft:gpt-3.5-turbo-0125:personal::9ol99gYa"
 directory = "./rag_source"
 file = "*.pdf"
-# ここは触らない
 contextualize_q_system_prompt = (
     "チャット履歴と，チャット履歴のコンテキストを参照する可能性のある最新のユーザの質問が与えられた場合，チャット履歴を優先的に参照して質問に答えてください．"
 )
-# ここにBotのプロンプトを書く．
 qa_system_prompt = "あなたの名前はずんだもんです．これからはすべて日本語で回答してください．また，回答は必ず，contextとhistoryを参照してから行ってください．{context}"
 
-# テキストモデルの呼び出し
 text_model = rag.create_chat_model(model_name)
-# pdfファイルの読み込み
 retriever = rag.loade_pdf(directory, file)
-# chainの作成
 conversational_rag_chain = rag.create_chain(text_model, retriever, contextualize_q_system_prompt, qa_system_prompt)
 
 try:
@@ -45,38 +43,55 @@ try:
         chat_history = pickle.load(f)
 except FileNotFoundError:
     chat_history = []
+
 print("System startup is complete.")
 
-while True:
-    outputs = ""
-    inputs = b""
+def handle_client_connection(conn):
+    global chat_history
     while True:
-        chunk = conn.recv(4096)
-        if not chunk:
+        try:
+            print("waiting...")
+            inputs = conn.recv(4096)
+            if not inputs:
+                break
+            print("data received")
+            inputs = inputs.decode()
+            print("inputs : " + str(inputs))
+            if inputs.lower() == "exit":
+                break
+            outputs = conversational_rag_chain.invoke(
+                {"input": inputs},
+                config=config,
+            )
+            print("ずんだもん：", outputs["answer"])
+            chat_history = rag.add_history(chat_history, inputs, outputs)
+            response = t2s.generate_speech(outputs["answer"])
+            response = pickle.dumps(response.content)
+            print("response size : ", len(response))
+            conn.sendall(response)
+            print("done")
+        except (BrokenPipeError, ConnectionResetError, socket.timeout) as e:
+            print(f"Error: {e}, connection lost")
             break
-        inputs += chunk
-    inputs = inputs.decode()
-    print("inputs : " + str(inputs))
-    if inputs.lower() == "exit":
-        break
-    outputs = conversational_rag_chain.invoke(
-        {"input":inputs},
-        config=config,
-        )
-    chat_history = rag.add_history(chat_history, inputs, outputs)
-    response = t2s.generate_speech(outputs["answer"])
-    response = pickle.dumps(response.content)
-    print(len(response))
-    s.sendall(response)
-    print("done")
-    #print("ずんだもん：", outputs["answer"])
-    #sa.WaveObject.from_wave_file(io.BytesIO(response.content)).play()
-    #audio_segment = AudioSegment.from_file(io.BytesIO(response.content),foemat="wav")
-    #play(audio_segment)
-    #print(chat_history)
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            break
 
-with open("history_" + config["configurable"]["session_id"] + ".plk", "wb") as f:
-    pickle.dump(chat_history, f)
-print("ずんだもん：会話内容を保存したのだ．また今度なのだ．")
+    with open("history_" + config["configurable"]["session_id"] + ".plk", "wb") as f:
+        pickle.dump(chat_history, f)
+    print("ずんだもん：会話内容を保存したのだ．また今度なのだ．")
+
+while True:
+    try:
+        conn, addr = s.accept()
+        print("Connection from", addr)
+        handle_client_connection(conn)
+        conn.close()
+    except KeyboardInterrupt:
+        print("Server is shutting down.")
+        break
+    except Exception as e:
+        print(f"Error accepting connections: {e}")
+
 s.close()
 
