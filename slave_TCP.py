@@ -27,12 +27,7 @@ try:
             break
         
         response = b''
-        while True:
-            part = s.recv(4096)
-            if not part:
-                break
-            response += part
-        
+        response = s.recv(4096)
         print("Data received")
         print("Total : " + str(len(response)))
         
