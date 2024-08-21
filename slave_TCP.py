@@ -7,6 +7,7 @@ import sounddevice as sd
 from scipy.io.wavfile import write
 import keyboard
 import numpy as np
+import mpv
 
 #########
 # SLAVE #

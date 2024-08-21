@@ -26,3 +26,6 @@ umap-learn
 python-dotenv
 load_dotenv
 simpleaudio
+sounddevice
+keyboard
+

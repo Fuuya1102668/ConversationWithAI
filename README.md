@@ -29,13 +29,23 @@ source venv/bin/activate
 ```
 pip install -r requirements.txt
 ```
+
 動画再生に用いているmpvを使うにはlibmpv-devをインストールする必要がある．
+
 ```
 sudo apt install libmpv-dev
 ```
+
 音声再生に用いるsimpleaudioを使うには以下をインストールする．
+
 ```
 sudo apt install build-essential python3-dev libasound2-dev
+```
+
+音声録音に用いるsounddeviceを使うには以下をインストールする．
+
+```
+sudo apt install portaudio19-dev
 ```
 
 - サーバの起動
