@@ -20,6 +20,9 @@ channels = 2  # ステレオ録音
 # 録音データを格納するリスト
 recorded_frames = []
 
+# 動画再生のインスタンス生成
+player = mpv.MPV(volume=0, loop="inf", fullscreen=True)
+
 def start_recording():
     global recording
     print("Recording started...")
@@ -73,6 +76,7 @@ try:
 
         
         response_content = pickle.loads(response)
+        player.pause = True
         sa.WaveObject.from_wave_file(io.BytesIO(response_content)).play()
         print("Response played")
 
