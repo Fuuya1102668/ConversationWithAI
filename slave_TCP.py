@@ -56,9 +56,9 @@ try:
 
         
         response_content = pickle.loads(response)
-        player.pause = False
-        sa.WaveObject.from_wave_file(io.BytesIO(response_content)).play()
         print("Response played")
+        player.pause = False
+        sa.WaveObject.from_wave_file(io.BytesIO(response_content)).play().wait_done()
 
 except Exception as e:
     print(f"An error occurred: {e}")
