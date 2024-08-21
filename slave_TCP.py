@@ -22,10 +22,14 @@ channels = 2  # ステレオ録音
 recorded_frames = []
 
 # 動画再生のインスタンス生成
-player01 = mpv.MPV(volume=0, loop="inf", fullscreen=True)
-player01.play("dottimo.mp4")
-player01.pause = True
-player02 = mpv.MPV(volume=0, loop="inf", fullscreen=True)
+video01 = "kutipaku.mp4"
+video02 = "dottimo.mp4"
+#player01 = mpv.MPV(volume=0, loop="inf", fullscreen=True)
+#player02 = mpv.MPV(volume=45, loop="inf", fullscreen=True)
+player01 = mpv.MPV(volume=0, loop="inf", ontop=True)
+player02 = mpv.MPV(volume=45, loop="inf", ontop=False)
+player01.play(video01)
+player02.play(video02)
 
 master_ip = get.get_master_ip()
 master_port = int(get.get_master_port())
@@ -38,8 +42,10 @@ print("Connected to server")
 
 try:
     while True:
-        player01.pause = True
-        player02.play("oshiri.mp4")
+        player01.stop()
+#        player01.ontop = False
+        player02.pause = False
+#        player02.ontop = True
         inputs = input("  あなた  ：")
         s.sendall(inputs.encode())
         if inputs.lower() == "exit":
@@ -60,7 +66,7 @@ try:
         response_content = pickle.loads(response)
         print("Response played")
         player02.pause = True
-        player01.play("dottimo.mp4")
+        player01.play(video01)
         sa.WaveObject.from_wave_file(io.BytesIO(response_content)).play().wait_done()
 
 except Exception as e:

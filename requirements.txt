@@ -29,4 +29,5 @@ simpleaudio
 sounddevice
 keyboard
 python-mpv
+pygetwindow
 
