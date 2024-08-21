@@ -1,14 +1,41 @@
 import getapi as get
 import socket
 import pickle
-
 import io
 import simpleaudio as sa
+import sounddevice as sd
+from scipy.io.wavfile import write
+import keyboard
+import numpy as np
 
 #########
 # SLAVE #
 #  TCP  #
 #########
+
+# 録音設定
+sample_rate = 44100  # サンプリング周波数
+channels = 2  # ステレオ録音
+
+# 録音データを格納するリスト
+recorded_frames = []
+
+def start_recording():
+    global recording
+    print("Recording started...")
+    recording = True
+    while recording:
+        frame = sd.rec(1024, samplerate=sample_rate, channels=channels, dtype='float64')
+        sd.wait()
+        recorded_frames.append(frame)
+
+def stop_recording():
+    global recording
+    recording = False
+    print("Recording stopped.")
+    # リストに格納した録音データを1つの配列に結合
+    recorded_data = np.concatenate(recorded_frames, axis=0)
+    write("input.wav", sample_rate, recorded_data)
 
 master_ip = get.get_master_ip()
 master_port = int(get.get_master_port())
@@ -20,9 +47,16 @@ s.connect((master_ip, master_port))
 print("Connected to server")
 
 try:
+    recording = False
+    print("Press the Space key to start/stop recording.")
     while True:
-        inputs = input("  あなた  ：")
-        s.sendall(inputs.encode())
+        if keyboard.is_pressed('space'):
+            if not recording:
+                recorded_frames = []  # 録音データのリストをリセット
+                start_recording()
+            else:
+                stop_recording()
+        s.sendall(input.wav)
         if inputs.lower() == "exit":
             break
         
