@@ -23,23 +23,8 @@ recorded_frames = []
 
 # 動画再生のインスタンス生成
 player = mpv.MPV(volume=0, loop="inf", fullscreen=True)
-
-def start_recording():
-    global recording
-    print("Recording started...")
-    recording = True
-    while recording:
-        frame = sd.rec(1024, samplerate=sample_rate, channels=channels, dtype='float64')
-        sd.wait()
-        recorded_frames.append(frame)
-
-def stop_recording():
-    global recording
-    recording = False
-    print("Recording stopped.")
-    # リストに格納した録音データを1つの配列に結合
-    recorded_data = np.concatenate(recorded_frames, axis=0)
-    write("input.wav", sample_rate, recorded_data)
+player.play("dottimo.mp4")
+player.pause = True
 
 master_ip = get.get_master_ip()
 master_port = int(get.get_master_port())
@@ -51,9 +36,8 @@ s.connect((master_ip, master_port))
 print("Connected to server")
 
 try:
-    recording = False
-    print("Press the Space key to start/stop recording.")
     while True:
+        player.pause = True
         inputs = input("  あなた  ：")
         s.sendall(inputs.encode())
         if inputs.lower() == "exit":
@@ -72,7 +56,7 @@ try:
 
         
         response_content = pickle.loads(response)
-        player.pause = True
+        player.pause = False
         sa.WaveObject.from_wave_file(io.BytesIO(response_content)).play()
         print("Response played")
 
