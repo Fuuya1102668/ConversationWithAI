@@ -23,6 +23,6 @@ torch
 torchaudio
 transformers
 umap-learn
-dotenv
+python-dotenv
 load_dotenv
 simpleaudio
