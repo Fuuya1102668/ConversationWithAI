@@ -28,4 +28,5 @@ load_dotenv
 simpleaudio
 sounddevice
 keyboard
+python-mpv
 
