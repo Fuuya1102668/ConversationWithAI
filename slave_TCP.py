@@ -54,13 +54,8 @@ try:
     recording = False
     print("Press the Space key to start/stop recording.")
     while True:
-        if keyboard.is_pressed('space'):
-            if not recording:
-                recorded_frames = []  # 録音データのリストをリセット
-                start_recording()
-            else:
-                stop_recording()
-        s.sendall(input.wav)
+        inputs = input("  あなた  ：")
+        s.sendall(inputs.encode())
         if inputs.lower() == "exit":
             break
         
