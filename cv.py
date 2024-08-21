@@ -1,63 +1,50 @@
 import cv2
+import threading
 import time
 
 # 動画ファイルのパス
-video1 = 'dottimo.mp4'
-video2 = 'kutipaku.mp4'
+video1 = "kutipaku.mp4"
+video2 = "dottimo.mp4"
 
-# 再生間隔（秒）
-play_duration = 3
-
-# 動画キャプチャオブジェクトを作成
-cap1 = cv2.VideoCapture(video1)
-cap2 = cv2.VideoCapture(video2)
-
-# ウィンドウの名前を指定
-window_name = 'Video Player'
+# ウィンドウの名前
+window_name1 = 'Video 1'
+window_name2 = 'Video 2'
 
 # フレームレートを設定
 fps = 30
 delay = int(1000 / fps)
 
-# ウィンドウをフルスクリーンで表示する関数
-def display_video(cap):
-    global start_time
-    start_time = time.time()
+def display_video(video_path, window_name):
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"Error opening video file: {video_path}")
+        return
     
-    while cap.isOpened():
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
+    while True:
         ret, frame = cap.read()
         if not ret:
             break
-        
         cv2.imshow(window_name, frame)
-        
-        # 一定時間経過後に映像を切り替え
-        if time.time() - start_time > play_duration:
-            break
-
-        # 3秒ごとに映像を更新
         if cv2.waitKey(delay) & 0xFF == ord('q'):
             break
 
-# ウィンドウを作成し、動画を交互に表示するループ
-cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    cap.release()
+    cv2.destroyWindow(window_name)
 
-while True:
-    # 最初の動画を表示
-    cap1.set(cv2.CAP_PROP_POS_FRAMES, 0)  # 動画を最初に戻す
-    display_video(cap1)
+# スレッドの作成
+thread1 = threading.Thread(target=display_video, args=(video1, window_name1))
+thread2 = threading.Thread(target=display_video, args=(video2, window_name2))
 
-    # 次の動画を表示
-    cap2.set(cv2.CAP_PROP_POS_FRAMES, 0)  # 動画を最初に戻す
-    display_video(cap2)
+# スレッドの開始
+thread1.start()
+thread2.start()
 
-    # ループを続けるか確認
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+# スレッドの終了を待機
+thread1.join()
+thread2.join()
 
-# リソースを解放してウィンドウを閉じる
-cap1.release()
-cap2.release()
-cv2.destroyAllWindows()
+print("Both videos have finished playing.")
 
