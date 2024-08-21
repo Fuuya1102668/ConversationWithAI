@@ -83,7 +83,8 @@ def add_history(chat_history, inputs, outputs):
 if __name__ == "__main__":
     os.environ["OPENAI_API_KEY"] = getapi.get_api()
     config = {"configurable": {"session_id": "zunda"}}
-    model_name = "ft:gpt-3.5-turbo-0125:personal::9ol99gYa"
+    #model_name = "gpt-3.5-turbo-0125:personal::9ol99gYa"
+    model_name = "ft:gpt-4o-mini-2024-07-18:personal::9xnTRBnP"
     directory = "./rag_source"
     file = "*.pdf"
     contextualize_q_system_prompt = (
