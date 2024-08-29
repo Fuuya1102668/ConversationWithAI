@@ -37,7 +37,7 @@ print("Connected to server")
 
 try:
     while True:
-        cv_sock.sendo(b"video1", (cv_ip, cv_port))
+        cv_sock.sendto(b"video1", (cv_ip, cv_port))
         inputs = input("  あなた  ：")
         s.sendall(inputs.encode())
 
@@ -58,7 +58,7 @@ try:
         
         response_content = pickle.loads(response)
         print("Response played")
-        cv_sock.sendo(b"video2", (cv_ip, cv_port))
+        cv_sock.sendto(b"video2", (cv_ip, cv_port))
         sa.WaveObject.from_wave_file(io.BytesIO(response_content)).play().wait_done()
 
 except Exception as e:
