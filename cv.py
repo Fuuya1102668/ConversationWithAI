@@ -3,8 +3,8 @@ import socket
 import time
 
 # 動画ファイルのパス
-video1 = "taiki.mp4" # 入力待機
-video2 = "kaitou.mp4" # 回答時
+video1 = "taiki.mp4"  # 入力待機
+video2 = "kaitou.mp4"  # 回答時
 
 # ウィンドウの名前
 window_name = 'Video Player'
@@ -30,12 +30,19 @@ delay = int(1000 / fps)  # フレーム間の遅延
 # UDPソケットの非ブロッキング設定
 sock.setblocking(False)
 
+# 動画の目標サイズ
+target_width = 1440
+target_height = 3440
+
 while True:
     ret, frame = cap.read()
     if not ret:
         cap.release()
         cap = cv2.VideoCapture(current_video)
         continue  # 動画が終了したら最初から再生
+
+    # フレームを指定のサイズにリサイズ
+    frame = cv2.resize(frame, (target_width, target_height))
 
     cv2.imshow(window_name, frame)
 
