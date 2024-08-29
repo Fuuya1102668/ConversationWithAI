@@ -3,7 +3,7 @@ import socket
 import time
 
 # 動画ファイルのパス
-video1 = "taiki.mp4"  # 入力待機
+video1 = "taiki01.mp4"  # 入力待機
 video2 = "kaitou.mp4"  # 回答時
 
 # ウィンドウの名前
@@ -40,9 +40,6 @@ while True:
         cap.release()
         cap = cv2.VideoCapture(current_video)
         continue  # 動画が終了したら最初から再生
-
-    # フレームを指定のサイズにリサイズ（最適化された補間方法を使用）
-    frame = cv2.resize(frame, (target_width, target_height), interpolation=cv2.INTER_NEAREST)
 
     cv2.imshow(window_name, frame)
 
