@@ -3,8 +3,8 @@ import socket
 import time
 
 # 動画ファイルのパス
-video1 = "dottimo.mp4"
-video2 = "kutipaku.mp4"
+video1 = "taiki.mp4" # 入力待機
+video2 = "kaitou.mp4" # 回答時
 
 # ウィンドウの名前
 window_name = 'Video Player'
