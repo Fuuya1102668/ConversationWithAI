@@ -41,8 +41,8 @@ while True:
         cap = cv2.VideoCapture(current_video)
         continue  # 動画が終了したら最初から再生
 
-    # フレームを指定のサイズにリサイズ
-    frame = cv2.resize(frame, (target_width, target_height))
+    # フレームを指定のサイズにリサイズ（最適化された補間方法を使用）
+    frame = cv2.resize(frame, (target_width, target_height), interpolation=cv2.INTER_NEAREST)
 
     cv2.imshow(window_name, frame)
 
