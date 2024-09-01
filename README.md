@@ -45,9 +45,16 @@ sudo apt install build-essential python3-dev libasound2-dev
 sudo apt install portaudio19-dev
 ```
 
-https://github.com/litagin02/Style-Bert-VITS2を参考にモデルを構築する．
+https://github.com/litagin02/Style-Bert-VITS2
+
+を参考にモデルを構築する．
 
 ## slave
+
+特になし
+
+
+# RAGの使用
 
 # 動かし方
 
@@ -67,7 +74,11 @@ python3 master_TCP.py
 
 slaveで以下を実行する．
 
+masterからsshで接続して，slave_TCP.pyを実行するのがおすすめ．
+cv.pyはslaveで実行する．
+
 ```
+python3 cv.py &
 python3 slave_TCP.py
 ```
 
