@@ -2,12 +2,10 @@
 全部pythonでかいた
 
 # 概要
-ローカルLLMとvoicevoxを用いて，テキストベースの会話ができるChatBotを作った．
+LangChainとT2Sを用いて，テキストベースの会話ができるChatBotを作った．
 
-ローカルLLMのベースモデルはllama3を使用する．
-Modelfileで少し調教している．
-
-voicevoxの話者はずんだもんで設定している．
+このシステムはmasterとslaveの2つのプログラムから成り立つ．
+コンピュータ1台でも実装することができる．
 
 # 環境の構築
 
@@ -30,12 +28,11 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-動画再生に用いているmpvを使うにはlibmpv-devをインストールする必要がある．
+- ipとportの指定
+.envを作成してip addresとportを指定する．
 
-```
-sudo apt install libmpv-dev
-```
 
+## master
 音声再生に用いるsimpleaudioを使うには以下をインストールする．
 
 ```
@@ -48,15 +45,40 @@ sudo apt install build-essential python3-dev libasound2-dev
 sudo apt install portaudio19-dev
 ```
 
-- サーバの起動
+https://github.com/litagin02/Style-Bert-VITS2
+
+を参考にモデルを構築する．
+
+## slave
+
+特になし
+
+
+# RAGの使用
+
+# 動かし方
+
+- T2Sサーバの起動
 
 ```
-o;asnboan:
+python3 server_fastapi.py
 ```
 
 - 実行
 
+masterで以下を実行する．
+
 ```
-python3 character_langchain_RAG_PDF.py
+python3 master_TCP.py
+```
+
+slaveで以下を実行する．
+
+masterからsshで接続して，slave_TCP.pyを実行するのがおすすめ．
+cv.pyはslaveで実行する．
+
+```
+python3 cv.py &
+python3 slave_TCP.py
 ```
 
