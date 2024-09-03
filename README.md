@@ -45,6 +45,13 @@ sudo apt install build-essential python3-dev libasound2-dev
 sudo apt install portaudio19-dev
 ```
 
+python-magicを使うには以下をインストールする．
+
+```
+sudo apt-get install libmagic1
+sudo apt-get install libmagic-dev
+```
+
 https://github.com/litagin02/Style-Bert-VITS2
 
 を参考にモデルを構築する．
