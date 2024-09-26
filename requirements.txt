@@ -10,5 +10,4 @@ langchain_openai==0.1.17
 langchain_chroma==0.1.2
 unstructured
 python-magic==0.4.27
-"unstructured[pdf]"
 
