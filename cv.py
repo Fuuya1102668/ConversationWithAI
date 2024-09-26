@@ -54,7 +54,7 @@ while True:
     except BlockingIOError:
         pass  # データが届いていない場合はスルー
 
-    if cv2.waitKey(delay) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break  # 'q'キーが押されたら終了
 
 # クリーンアップ
