@@ -23,16 +23,10 @@ python3 venv vnev
 source venv/bin/activate
 ``` 
 
-- モジュールのインストール
-```
-pip install -r requirements.txt
-```
-
-- ipとportの指定
+- ipとportの指定\\
 .envを作成してip addresとportを指定する．
 
-
-## master
+- 必要なモジュールのインストール．
 音声再生に用いるsimpleaudioを使うには以下をインストールする．
 
 ```
@@ -52,14 +46,26 @@ sudo apt-get install libmagic1
 sudo apt-get install libmagic-dev
 ```
 
+- モジュールのインストール
+```
+pip install -r requirements.txt
+```
+
 https://github.com/litagin02/Style-Bert-VITS2
 
 を参考にモデルを構築する．
 
+## master
+
+```
+python3 master_TCP.py
+```
+
 ## slave
 
-特になし
-
+```
+python3 slave_TCP.py
+```
 
 # RAGの使用
 
