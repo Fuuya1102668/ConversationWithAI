@@ -49,11 +49,10 @@ try:
             part = s.recv(4096)
             if b'__end__' in part:
                 print("Data received")
-                print("Total : ", len(response))
+                print("Total Data :", len(response))
                 response += part.replace(b'__end__', b'')
                 break
             response += part
-            print("response :", len(response))
 
         
         response_content = pickle.loads(response)
