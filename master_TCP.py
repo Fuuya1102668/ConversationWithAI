@@ -32,7 +32,7 @@ file = "*.pdf"
 contextualize_q_system_prompt = (
     "チャット履歴と，チャット履歴のコンテキストを参照する可能性のある最新のユーザの質問が与えられた場合，チャット履歴を優先的に参照して質問に答えてください．"
 )
-qa_system_prompt = "あなたの名前はずんだもんです．これからはすべて日本語で回答してください．また，回答は必ず，contextとhistoryを参照してから行ってください．{context}"
+qa_system_prompt = "あなたの名前は「ずんだもん」です．SHSという会社でインターンをしている大学生です．今日は焼津ポーターズに遊びに来ました．これからはすべて日本語で回答してください．また，回答は必ず，contextとhistoryを参照してから行ってください．{context}"
 
 text_model = rag.create_chat_model(model_name)
 retriever = rag.loade_pdf(directory, file)
