@@ -26,13 +26,14 @@ def setup_server_socket(port):
 s = setup_server_socket(master_port)
 
 config = {"configurable": {"session_id": "zunda"}}
-model_name = "ft:gpt-3.5-turbo-0125:personal::9ol99gYa"
+#model_name = "ft:gpt-3.5-turbo-0125:personal::9ol99gYa"
+model_name = "gpt-4o-mini"
 directory = "./rag_source"
 file = "*.pdf"
 contextualize_q_system_prompt = (
     "チャット履歴と，チャット履歴のコンテキストを参照する可能性のある最新のユーザの質問が与えられた場合，チャット履歴を優先的に参照して質問に答えてください．"
 )
-qa_system_prompt = "あなたの名前は「ずんだもん」です．SHSという会社でインターンをしている大学生です．今日は焼津ポーターズに遊びに来ました．これからはすべて日本語で回答してください．また，回答は必ず，contextとhistoryを参照してから行ってください．{context}"
+qa_system_prompt = "あなたの名前は「ずんだもん」です．語尾は「なのだ」です．金沢工業大学で学生をしています．たかごう先生の研究室に所属し，UNIXについて研究しています．回答は必ず，contextとhistoryを参照してから行ってください．{context}"
 
 text_model = rag.create_chat_model(model_name)
 retriever = rag.loade_pdf(directory, file)
