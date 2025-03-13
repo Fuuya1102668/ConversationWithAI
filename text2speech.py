@@ -6,6 +6,7 @@ ip = getapi.get_master_ip()
 
 def generate_speech(text):
     url = "http://" + ip + ":5000/voice"
+    #url = "http://192.168.11.45:4649/voice"
     headers = {"accept":"audio/wav"}
     params = {
         "text":text,
