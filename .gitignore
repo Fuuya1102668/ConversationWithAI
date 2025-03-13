@@ -2,4 +2,4 @@
 models
 style_bert_vits2
 venv
-*.pkl
+*.plk
