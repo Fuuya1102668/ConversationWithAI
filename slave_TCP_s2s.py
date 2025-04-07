@@ -1,104 +1,101 @@
+import threading
+import queue
 import getapi as get
 import vad
 import socket
 import pickle
 import io
-import tempfile
-import os
-import subprocess
-import threading
+import sounddevice as sd
+import soundfile as sf
 
-#########
-# SLAVE #
-#  TCP  #
-#########
-
-current_proc_lock = threading.Lock()
-current_proc = None
-
-def play_audio_async(audio_bytes):
-    global current_proc
-
-    # 再生中プロセスがあれば停止
-    with current_proc_lock:
-        if current_proc and current_proc.poll() is None:
-            current_proc.terminate()
-
-        # 新しい再生を開始（非同期）
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-            tmp.write(audio_bytes)
-            tmp_path = tmp.name
-
-        proc = subprocess.Popen([
-            "ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", tmp_path
-        ])
-        current_proc = proc
-
-def stop_audio_playback():
-    global current_proc
-    with current_proc_lock:
-        if current_proc and current_proc.poll() is None:
-            current_proc.terminate()
-        current_proc = None
-
-# 接続設定
+# サーバ設定
 master_ip = get.get_master_ip()
 master_port = int(get.get_master_port())
-slave_port = int(get.get_slave_port())
 
-cv_ip = "127.0.0.1"
-cv_port = 23456
-
+# TCPソケット
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((master_ip, master_port))
 
+# UDPソケット（映像制御用）
+cv_ip = "127.0.0.1"
+cv_port = 23456
 cv_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 print("Connected to server")
 
+# 音声応答データの受信キュー
+playback_queue = queue.Queue()
+
+# TCP受信スレッド
+def tcp_receiver():
+    try:
+        while True:
+            response = b''
+            while True:
+                part = s.recv(4096)
+                if b'__end__' in part:
+                    response += part.replace(b'__end__', b'')
+                    break
+                response += part
+            response_content = pickle.loads(response)
+            playback_queue.put(response_content)
+    except Exception as e:
+        print(f"[Receiver] Error: {e}")
+
+def playback_worker():
+    while True:
+        wav_bytes = playback_queue.get()  # キューから取得（ブロッキング）
+        try:
+            with sf.SoundFile(io.BytesIO(wav_bytes), 'rb') as f:
+                data = f.read(dtype='float32')
+                sd.play(data, f.samplerate)
+                sd.wait()  # 再生完了を待つ（このスレッド内で完結）
+        except Exception as e:
+            print(f"[Playback] Error: {e}")
+        playback_queue.task_done()
+
+def stop_all_playback():
+    # 再生中の音声を停止
+    sd.stop()
+    
+    # キューを空にする（1つずつ取り出して捨てる）
+    while not playback_queue.empty():
+        try:
+            playback_queue.get_nowait()
+            playback_queue.task_done()
+        except queue.Empty:
+            break
+
+    print("[Playback] All playback stopped and queue cleared.")
+
+# 受信スレッド開始
+threading.Thread(target=tcp_receiver, daemon=True).start()
+threading.Thread(target=playback_worker, daemon=True).start()
+
 try:
     while True:
-        # 映像切替指示（入力開始）
+        # 音声認識 → 送信
         cv_sock.sendto(b"video1", (cv_ip, cv_port))
-
-        # 音声入力（非同期再生中でも即開始）
         VAD = vad.VoiceActivityDetector()
         inputs = VAD.listen_and_transcribe()
         print(f"  あなた  ：{inputs}")
         s.sendall(inputs.encode())
+        stop_all_playback()
 
         if inputs.lower() == "exit":
             break
 
-        # レスポンスの受信
-        response = b''
-        while True:
-            part = s.recv(4096)
-            if b'__end__' in part:
-                print("Data received")
-                print("Total Data :", len(response))
-                response += part.replace(b'__end__', b'')
-                break
-            response += part
+        # 受信待ち（非同期的に受信される）
+        print("Waiting for response...")
+        response = playback_queue.get()  # ブロッキングで待機
 
-        try:
-            response_content = pickle.loads(response)
-            print("Response received")
-
-            # 映像切替（応答再生）
-            cv_sock.sendto(b"video2", (cv_ip, cv_port))
-
-            # 再生中の音声を止めて，新しい音声を非同期再生
-            play_audio_async(response_content)
-
-        except Exception as e:
-            print(f"音声処理エラー: {e}")
+        print("Response played")
+        cv_sock.sendto(b"video2", (cv_ip, cv_port))
 
 except Exception as e:
-    print(f"システムエラー: {e}")
+    print(f"An error occurred: {e}")
 
 finally:
     s.close()
     cv_sock.close()
-    stop_audio_playback()
     print("Connection closed")
