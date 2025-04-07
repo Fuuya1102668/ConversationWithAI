@@ -4,9 +4,6 @@ import getapi as get
 import pickle
 import os
 
-import io
-import simpleaudio as sa
-
 import socket
 
 os.environ["OPENAI_API_KEY"] = get.get_api()

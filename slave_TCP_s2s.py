@@ -4,11 +4,6 @@ import socket
 import pickle
 import io
 import simpleaudio as sa
-import sounddevice as sd
-from scipy.io.wavfile import write
-import keyboard
-import numpy as np
-import time
 
 #########
 # SLAVE #
