@@ -87,7 +87,6 @@ try:
 
         # 受信待ち（非同期的に受信される）
         print("Waiting for response...")
-        response = playback_queue.get()  # ブロッキングで待機
 
         print("Response played")
         cv_sock.sendto(b"video2", (cv_ip, cv_port))
