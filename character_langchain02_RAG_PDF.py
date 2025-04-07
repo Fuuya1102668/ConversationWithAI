@@ -28,7 +28,10 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
     return store[session_id]
 
 def create_chat_model(model_name):
-    text_model = ChatOpenAI(model=model_name)
+    text_model = ChatOpenAI(
+        model=model_name,
+        streaming=True
+    )
     return text_model
 
 def loade_pdf(directory, file):
