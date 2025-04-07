@@ -57,43 +57,17 @@ def handle_client_connection(conn):
             print("inputs : " + str(inputs))
             if inputs.lower() == "exit":
                 break
-
-            # ストリーム開始
-            stream = conversational_rag_chain.stream(
+            outputs = conversational_rag_chain.invoke(
                 {"input": inputs},
                 config=config,
             )
-
-            # ストリーミング出力の分割と音声変換
-            buffer = ""
-            for chunk in stream:
-                content = chunk.get("answer", "")
-                buffer += content
-                print(content, end="", flush=True)
-
-                while any(p in buffer for p in "。、！"):
-                    for i, char in enumerate(buffer):
-                        if char in "。、！":
-                            segment = buffer[:i+1]
-                            buffer = buffer[i+1:]
-                            print(f"\n[音声送信] {segment}")
-                            response = t2s.generate_speech(segment)
-                            response = pickle.dumps(response.content)
-                            conn.sendall(response)
-                            conn.sendall(b'__end__')
-                            break
-
-            # 最後の残りも送信
-            if buffer.strip():
-                print(f"\n[残り音声送信] {buffer}")
-                response = t2s.generate_speech(buffer)
-                response = pickle.dumps(response.content)
-                conn.sendall(response)
-                conn.sendall(b'__end__')
-
-            # 履歴追加
-            chat_history = rag.add_history(chat_history, inputs, {"answer": buffer})
-            print("done")
+            print("ずんだもん：", outputs["answer"])
+            chat_history = rag.add_history(chat_history, inputs, outputs)
+            response = t2s.generate_speech(outputs["answer"])
+            response = pickle.dumps(response.content)
+            print("response size : ", len(response))
+            conn.sendall(response)
+            conn.sendall(b'__end__')
         except (BrokenPipeError, ConnectionResetError, socket.timeout) as e:
             print(f"Error: {e}, connection lost")
             break
