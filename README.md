@@ -11,36 +11,31 @@ LangChainとT2Sを用いて，テキストベースの会話ができるChatBot�
 
 ## 構築手順
 - git clone 
-
 ```
 git clone git@github.com:Fuuya1102668/ConversationWithAI.git`
 ```
 
 - 仮想環境を作る
-
-```
+``` shell
 python3 venv vnev
 source venv/bin/activate
-``` 
-
-- ipとportの指定\\
+```
+---
+- ipとportの指定
 .envを作成してip addresとportを指定する．
 
 - 必要なモジュールのインストール．
 音声再生に用いるsimpleaudioを使うには以下をインストールする．
-
 ```
 sudo apt install build-essential python3-dev libasound2-dev
 ```
 
 音声録音に用いるsounddeviceを使うには以下をインストールする．
-
 ```
 sudo apt install portaudio19-dev
 ```
 
 python-magicを使うには以下をインストールする．
-
 ```
 sudo apt-get install libmagic1
 sudo apt-get install libmagic-dev
@@ -73,7 +68,6 @@ python3 slave_TCP.py
 # 動かし方
 
 - T2Sサーバの起動
-
 ```
 python3 server_fastapi.py
 ```
@@ -81,7 +75,6 @@ python3 server_fastapi.py
 - 実行
 
 masterで以下を実行する．
-
 ```
 python3 master_TCP.py
 ```
@@ -90,7 +83,6 @@ slaveで以下を実行する．
 
 masterからsshで接続して，slave_TCP.pyを実行するのがおすすめ．
 cv.pyはslaveで実行する．
-
 ```
 python3 cv.py &
 python3 slave_TCP.py
