@@ -37,8 +37,8 @@ def create_openai_model(model_name):
     )
     return text_model
 
-def ollama_model(model_name, prompt, ip, port="11434"):
-    url = "http://"+ip+":"+port
+def ollama_model(model_name, prompt, host, port="11434"):
+    url = "http://"+host+":"+port+"/api/generate"
     headers = {"Content-Type": "application/json"}
     data = {
         "model": model_name,

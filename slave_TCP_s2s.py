@@ -48,6 +48,7 @@ def playback_worker():
         try:
             with sf.SoundFile(io.BytesIO(wav_bytes), 'rb') as f:
                 data = f.read(dtype='float32')
+                sf.write("output.wav", data, f.samplerate)
                 sd.play(data, f.samplerate)
                 sd.wait()  # 再生完了を待つ（このスレッド内で完結）
         except Exception as e:

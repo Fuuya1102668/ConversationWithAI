@@ -3,7 +3,7 @@ import webrtcvad
 import sounddevice as sd
 import wave
 import time
-import whisper
+from faster_whisper import WhisperModel
 import threading
 
 class VoiceActivityDetector:
@@ -16,7 +16,8 @@ class VoiceActivityDetector:
         self.SILENCE_THRESHOLD = silence_threshold
         self.vad = webrtcvad.Vad()
         self.vad.set_mode(self.VAD_MODE)
-        self.model = whisper.load_model("medium")
+        self.model = WhisperModel("large-v2", device="cuda", compute_type="float16")
+        # self.model = WhisperModel("large-v2", device="cpu", compute_type="int8")
         self.recording = []
         self.recording_active = False
         self.silent_duration = 0
@@ -35,8 +36,9 @@ class VoiceActivityDetector:
             wf.setframerate(self.RATE)
             wf.writeframes(b''.join(self.recording))
         print(f"Saved: {self.filename}")
-        result = self.model.transcribe(self.filename, language="ja")
-        self.transcribed_text = result["text"]
+        results, info = self.model.transcribe(self.filename, language="ja")
+        for result in results:
+            self.transcribed_text += result.text
         print("Recognized Text:", self.transcribed_text)
         self.recording = []
 
