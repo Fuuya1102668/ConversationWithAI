@@ -14,10 +14,13 @@ from langchain_chroma import Chroma
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.document_loaders import PDFMinerLoader
+from langchain_community.llms import Ollama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+import requests
+import json
 import getapi, os
 
 store = {}
@@ -27,12 +30,27 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
         store[session_id] = InMemoryChatMessageHistory()
     return store[session_id]
 
-def create_chat_model(model_name):
+def create_openai_model(model_name):
     text_model = ChatOpenAI(
         model=model_name,
         streaming=True
     )
     return text_model
+
+def ollama_model(model_name, prompt, ip, port="11434"):
+    url = "http://"+ip+":"+port
+    headers = {"Content-Type": "application/json"}
+    data = {
+        "model": model_name,
+        "prompt": prompt,
+        "stream": False
+    }
+
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    response.raise_for_status()
+    result = response.json()
+
+    return result.get("response", "")
 
 def loade_pdf(directory, file):
     loader = DirectoryLoader(directory, glob=file)
@@ -95,7 +113,7 @@ if __name__ == "__main__":
     )
     qa_system_prompt = "あなたの名前はずんだもんです．語尾は「なのだ」または「のだ」です．例えば「こんにちは」は「こんにちはなのだ」になります．また，「よろしくお願いします」は「よろしくお願いするのだ」になります．これからはすべて日本語で回答してください．また，回答は必ず，contextを参照してから行ってください．{context}"
 
-    text_model = create_chat_model(model_name)
+    text_model = create_openai_model(model_name)
     retriever = loade_pdf(directory, file)
     conversational_rag_chain = create_chain(text_model, retriever, contextualize_q_system_prompt, qa_system_prompt)
 

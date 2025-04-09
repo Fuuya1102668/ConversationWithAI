@@ -24,7 +24,8 @@ s = setup_server_socket(master_port)
 
 config = {"configurable": {"session_id": "zunda"}}
 #model_name = "ft:gpt-3.5-turbo-0125:personal::9ol99gYa"
-model_name = "gpt-4o-mini"
+openai_model_name = "gpt-4o-mini"
+ollama_model_name = "translate_noda"
 directory = "./rag_source"
 file = "*.pdf"
 contextualize_q_system_prompt = (
@@ -32,7 +33,8 @@ contextualize_q_system_prompt = (
 )
 qa_system_prompt = "あなたの名前は「ずんだもん」です．語尾は「なのだ」です．金沢工業大学で学生をしています．たかごう先生の研究室に所属し，UNIXについて研究しています．回答は必ず，contextとhistoryを参照してから行ってください．{context}"
 
-text_model = rag.create_chat_model(model_name)
+text_model = rag.create_openai_model(openai_model_name)
+translate_model = rag.create_ollama_model(ollama_model_name, "202.13.169.3")
 retriever = rag.loade_pdf(directory, file)
 conversational_rag_chain = rag.create_chain(text_model, retriever, contextualize_q_system_prompt, qa_system_prompt)
 
@@ -61,9 +63,10 @@ def handle_client_connection(conn):
                 {"input": inputs},
                 config=config,
             )
-            print("ずんだもん：", outputs["answer"])
+            translated_output = rag.ollama_model(translate_model, outputs["answer"], "202.13.169.3")
+            print("ずんだもん：", translated_output)
             chat_history = rag.add_history(chat_history, inputs, outputs)
-            response = t2s.generate_speech(outputs["answer"])
+            response = t2s.generate_speech(translated_output)
             response = pickle.dumps(response.content)
             print("response size : ", len(response))
             conn.sendall(response)
