@@ -34,7 +34,6 @@ contextualize_q_system_prompt = (
 qa_system_prompt = "あなたの名前は「ずんだもん」です．語尾は「なのだ」です．金沢工業大学で学生をしています．たかごう先生の研究室に所属し，UNIXについて研究しています．回答は必ず，contextとhistoryを参照してから行ってください．{context}"
 
 text_model = rag.create_openai_model(openai_model_name)
-translate_model = rag.create_ollama_model(ollama_model_name, "202.13.169.3")
 retriever = rag.loade_pdf(directory, file)
 conversational_rag_chain = rag.create_chain(text_model, retriever, contextualize_q_system_prompt, qa_system_prompt)
 
