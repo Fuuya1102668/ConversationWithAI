@@ -25,7 +25,7 @@ s = setup_server_socket(master_port)
 config = {"configurable": {"session_id": "zunda"}}
 #model_name = "ft:gpt-3.5-turbo-0125:personal::9ol99gYa"
 openai_model_name = "gpt-4o-mini"
-ollama_model_name = "translate_noda"
+translate_model_name = "translate_noda"
 directory = "./rag_source"
 file = "*.pdf"
 contextualize_q_system_prompt = (
@@ -62,7 +62,7 @@ def handle_client_connection(conn):
                 {"input": inputs},
                 config=config,
             )
-            translated_output = rag.ollama_model(translate_model, outputs["answer"], "202.13.169.3")
+            translated_output = rag.ollama_model(translate_model_name, outputs["answer"], "202.13.169.3")
             print("ずんだもん：", translated_output)
             chat_history = rag.add_history(chat_history, inputs, outputs)
             response = t2s.generate_speech(translated_output)
